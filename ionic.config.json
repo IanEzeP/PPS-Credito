@@ -1,0 +1,7 @@
+{
+  "name": "PPS-Credito",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
