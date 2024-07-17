@@ -4,9 +4,16 @@
 
 export const environment = {
   production: false,
-  firebase: {"projectId":"pps-app-inicial","appId":"1:726889610212:web:21e8124f80dcdebb1065f1","storageBucket":"pps-app-inicial.appspot.com","apiKey":"AIzaSyB0PN_rS_NWMVz7wzdfZLrjY8p4tGJFBiA","authDomain":"pps-app-inicial.firebaseapp.com","messagingSenderId":"726889610212"}
+  firebase: {
+    apiKey: "AIzaSyB0PN_rS_NWMVz7wzdfZLrjY8p4tGJFBiA",
+    authDomain: "pps-app-inicial.firebaseapp.com",
+    projectId: "pps-app-inicial",
+    locationId: "us-central",
+    storageBucket: "pps-app-inicial.appspot.com",
+    messagingSenderId: "726889610212",
+    appId: "1:726889610212:web:21e8124f80dcdebb1065f1"
+  }
 };
-
 /*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.

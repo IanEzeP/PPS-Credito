@@ -93,7 +93,7 @@ export class LoginPage implements OnInit {
           Swal.close(this.alertController);
           this.alert.successToast("Sesión iniciada correctamente");
           this.cleanInputs();
-          this.router.navigateByUrl('/main');
+          this.router.navigateByUrl('/home');
         }, 1500);
       }
       ).catch(() => {
