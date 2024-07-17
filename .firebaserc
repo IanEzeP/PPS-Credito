@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "pps-app-inicial"
+  },
+  "targets": {
+    "pps-app-inicial": {
+      "hosting": {
+        "app": [
+          "pps-app-inicial"
+        ]
+      }
+    }
+  }
+}

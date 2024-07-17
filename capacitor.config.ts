@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'PPS-Credito',
+  appId: 'pps.iep.credito',
+  appName: 'Carga Credito',
   webDir: 'www'
 };
 

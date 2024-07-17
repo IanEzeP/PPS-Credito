@@ -1,0 +1,35 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="warning">
+    <ion-title>Carga Crédito</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div id="container">
+
+    <h1>Login standard, a la espera de personalización</h1>
+    
+    <div *ngIf="this.cargaFin == true; then mostrar else esperar"></div>
+
+    <ng-template #mostrar>
+      <ion-select label="Usuario rápido" fill="solid" (ionChange)="onQuickUser($event)">
+        <ion-select-option *ngFor="let item of arrayTestUsers" [value]="item">{{item.perfil}}</ion-select-option>
+      </ion-select>
+    </ng-template>
+
+    <ng-template #esperar>
+      <ion-select label="Cargando..." fill="outline"></ion-select>
+    </ng-template>
+    
+    <form class="needs-validation" [formGroup]="formLog">
+      <ion-input label="Correo:" type="email" fill="solid" formControlName="email"></ion-input>
+      <ion-input label="Clave:" type="password" fill="solid" formControlName="password"></ion-input>
+      <ion-button color="tertiary" shape="round" (click)="this.iniciarSesion()">Jugar</ion-button>
+    </form>
+    
+    <img src="../../assets/" alt="Logo" style="max-width: 50%; max-height: 50%; margin: auto;
+    display: block; margin-top: 40px;">
+
+  </div>
+</ion-content>
