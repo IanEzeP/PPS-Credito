@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Bienvenido: NOMBRE
+      Bienvenido: {{ nombre }}
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -11,8 +11,8 @@
   <div id="container">
 
     <div id="creditos">
-      <h1>Créditos: X</h1>
-      <ion-button>
+      <h1>Créditos: {{ creditos }}</h1>
+      <ion-button (click)="scan()" [disabled]="!(this.scanAvailable && this.scanSupported)">
         Escanear
       </ion-button>
     </div>

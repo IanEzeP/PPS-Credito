@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Carga Credito</string>
+    <string name="title_activity_main">Carga Credito</string>
+    <string name="package_name">pps.iep.credito</string>
+    <string name="custom_url_scheme">pps.iep.credito</string>
+</resources>

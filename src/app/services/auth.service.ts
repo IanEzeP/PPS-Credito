@@ -12,12 +12,14 @@ import { Auth,
 })
 export class AuthService {
 
-  logueado : boolean = false;
-  email : string = "";
-  perfil : string = "";
-  id : number = 0;
-  nombre : string = "";
-  sexo : string = "";
+  public logueado: boolean = false;
+
+  public loggedUser: any;
+  public email : string = "";
+  public perfil : string = "";
+  public id : number = 0;
+  public nombre : string = "";
+  public sexo : string = "";
   // Esto está mal, debería guardar una instancia de Usuario con todos los datos cargados
 
   constructor(private auth: Auth) { }

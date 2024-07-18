@@ -82,6 +82,7 @@ export class LoginPage implements OnInit {
       await this.auth.logIn(tmpUser.correo, tmpUser.clave).then(res =>
       {
         console.log("Usuario valido");
+        this.auth.loggedUser = tmpUser;
         this.auth.email = res!.user.email || '';
         this.auth.perfil = tmpUser.perfil;
         this.auth.id = tmpUser.id;
