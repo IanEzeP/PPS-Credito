@@ -36,7 +36,7 @@ export class HomePage implements OnInit, OnDestroy {
   /*
   QR encriptado, al escanearlo devuelve un código
   100 = 2786f4877b9091dcad7f35751bfcf5d5ea712b2f--
-  50 = ae338e4e0cbb4e4bcffaf9ce5b409feb8edd5172 --(Tiene un espacio al final, carácter vacio)
+  50 = ae338e4e0cbb4e4bcffaf9ce5b409feb8edd5172 --
   10 = 8c95def646b6127282ed50454b73240300dccabc--
   */
  
@@ -86,6 +86,9 @@ export class HomePage implements OnInit, OnDestroy {
       this.escaneosUsuarios = [];
       this.escaneosUsuarios = data;
       console.log(this.escaneosUsuarios);
+
+      let userInDB = this.escaneosUsuarios.find(doc => doc.idUsuario == this.idUser);
+      if (userInDB != undefined) { this.creditos = userInDB.creditosTotales; }
     }));
   }
 
@@ -101,30 +104,54 @@ export class HomePage implements OnInit, OnDestroy {
       let qrCargado = userInDB.codigosEscaneados.includes(this.infoQR);
 
       if (qrCargado == false) {
-        //Actualizamos la BD: Sumamos el valor del codigo a creditosTotales y lo añadimos a codigosEscaneados
-        const col = this.firestore.doc('creditos-usuarios/' + userInDB.id);
-        col.update({
-          creditosTotales: userInDB.creditosTotales + 0,//Valor del qr
-          codigosEscaneados: userInDB.codigosEscaneados.push(this.infoQR)
-        });
+        this.cargarCreditos(userInDB);
       } else {
-        if (this.perfil == 'admin') {
-          //Si está cargado una vez, cargarlo nuevamente, sino, rebotar solicitud
+        if (this.perfil == 'admin') {//Si está cargado una vez, cargarlo nuevamente, sino, rebotar solicitud
+          //Probar array.reduce. Alternativa usar indexof y lastindex y comparar los resultados
+          /*if () {
+            this.cargarCreditos(userInDB);
+          } else {
+            this.alert.sweetAlert('ERROR', 'No puedo volver a escanear este QR', 'error');
+          }*/
         } else {
           this.alert.sweetAlert('ERROR', 'No puedo volver a escanear este QR', 'error');
         }
       }
     } else {
-      this.cargarCreditos(); //Añadimos a la BD: Subimos idUsuario, codigosEscaneados con el qr, creditosTotales.
+      this.altaCreditosUsuario(); 
     }
   }
-
-  cargarCreditos() {
+  //Añadimos a la BD: Subimos idUsuario, codigosEscaneados con el qr, creditosTotales.
+  altaCreditosUsuario() {
     let codigo = this.codigosQR.find(qr => qr.id == this.infoQR);
-    let valor: number | undefined =  codigo.valor;
 
-    if (valor != undefined) {
-      this.creditos += valor;
+    if (codigo.valor != undefined) {
+      let codigosEscaneados: Array<string> = [codigo.id];
+
+      const newId = this.firestore.createId();
+      const doc = this.firestore.doc("creditos-usuarios/" + newId);
+      doc.set({
+        idUsuario: this.idUser,
+        codigosEscaneados: codigosEscaneados,
+        creditosTotales: codigo.valor
+      });
+
+      this.creditos = codigo.valor;
+    }
+  }
+  //Actualizamos la BD: Sumamos el valor del codigo a creditosTotales y añadimos el codigo a codigosEscaneados
+  cargarCreditos(usuarioCreditos: any) {
+    let codigo = this.codigosQR.find(qr => qr.id == this.infoQR);
+
+    if (codigo.valor != undefined) {
+      usuarioCreditos.creditosTotales += codigo.valor;
+      usuarioCreditos.codigosEscaneados.push(codigo.id);
+
+      const col = this.firestore.doc('creditos-usuarios/' + usuarioCreditos.id);
+      col.update({
+        creditosTotales: usuarioCreditos.creditosTotales,
+        codigosEscaneados: usuarioCreditos.codigosEscaneados
+      });
     }
   }
 
@@ -133,6 +160,7 @@ export class HomePage implements OnInit, OnDestroy {
 
     if (userInDB != undefined) {
       this.creditos = 0;
+
       const col = this.firestore.doc('creditos-usuarios/' + userInDB.id);
       col.update({
         creditosTotales: 0,
