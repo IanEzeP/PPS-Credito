@@ -7,6 +7,7 @@ import { AlertService } from 'src/app/services/alert.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { DatabaseService } from 'src/app/services/database.service';
 import { map, Subscription } from 'rxjs';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 
 @Component({
   selector: 'app-home',
@@ -29,7 +30,8 @@ export class HomePage implements OnInit, OnDestroy {
   private codigosSubs: Subscription = Subscription.EMPTY;
   private escaneosSubs: Subscription = Subscription.EMPTY;
 
-  constructor(private alert: AlertService, private data: DatabaseService, private auth: AuthService) {}
+  constructor(private alert: AlertService, private data: DatabaseService, 
+    private auth: AuthService, private firestore: AngularFirestore) {}
 
   /*
   QR encriptado, al escanearlo devuelve un código
@@ -58,7 +60,6 @@ export class HomePage implements OnInit, OnDestroy {
       }).catch((err) => console.log("Error: " + err));
     });
 
-    //Necesito 2 tablas, una de los qr y otra con la info de los usuarios y los qr que escanearon.
     const codigosObs = this.data.getCollectionSnapshot('codigos-qr')!.pipe(
       map((actions) => actions.map((a) => {
         const data = a.payload.doc.data() as any;
@@ -67,23 +68,25 @@ export class HomePage implements OnInit, OnDestroy {
       })
     ));
     
-    this.codigosSubs = codigosObs.subscribe(((data : any[]) => {
+    this.codigosSubs = codigosObs.subscribe(((data: any[]) => {
       this.codigosQR = [];
       this.codigosQR = data;
       console.log(this.codigosQR);
     }));
 
-    this.escaneosSubs = this.data.getCollectionObservable('creditos-usuarios').subscribe((next: any) => {
-      this.escaneosUsuarios = [];
-      this.escaneosUsuarios = next;
-      console.log(next);
-      /*
-      let result : Array<any> = next;
+    const escaneoObs = this.data.getCollectionSnapshot('creditos-usuarios')!.pipe(
+      map((actions) => actions.map((a) => {
+        const data = a.payload.doc.data() as any;
+        const id = a.payload.doc.id;
+        return {id, ...data};
+      })
+    ));
 
-      result.forEach(usuario => {
-        this.escaneosUsuarios.push(usuario);
-      });*/
-    });
+    this.escaneosSubs = escaneoObs.subscribe(((data: any[]) => {
+      this.escaneosUsuarios = [];
+      this.escaneosUsuarios = data;
+      console.log(this.escaneosUsuarios);
+    }));
   }
 
   ngOnDestroy(): void {
@@ -92,19 +95,31 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   evaluarCarga() {
-    this.escaneosUsuarios.forEach(doc => {
-      if (doc.idUsuario = this.idUser) {
+    let userInDB = this.escaneosUsuarios.find(doc => doc.idUsuario == this.idUser);
 
+    if (userInDB != undefined) {
+      let qrCargado = userInDB.codigosEscaneados.includes(this.infoQR);
+
+      if (qrCargado == false) {
+        //Actualizamos la BD: Sumamos el valor del codigo a creditosTotales y lo añadimos a codigosEscaneados
+        const col = this.firestore.doc('creditos-usuarios/' + userInDB.id);
+        col.update({
+          creditosTotales: userInDB.creditosTotales + 0,//Valor del qr
+          codigosEscaneados: userInDB.codigosEscaneados.push(this.infoQR)
+        });
       } else {
-        this.cargarCreditos();
+        if (this.perfil == 'admin') {
+          //Si está cargado una vez, cargarlo nuevamente, sino, rebotar solicitud
+        } else {
+          this.alert.sweetAlert('ERROR', 'No puedo volver a escanear este QR', 'error');
+        }
       }
-    });
+    } else {
+      this.cargarCreditos(); //Añadimos a la BD: Subimos idUsuario, codigosEscaneados con el qr, creditosTotales.
+    }
   }
 
   cargarCreditos() {
-    //Cruzar id de usuario con la lista relacional, Si hay coincidencia, cruzar qr scaneado con lista de qrs de la lista relacional.
-    //Si no hay coincidencia, crear documento y subirla a la lista relacional
-
     let codigo = this.codigosQR.find(qr => qr.id == this.infoQR);
     let valor: number | undefined =  codigo.valor;
 
@@ -113,17 +128,31 @@ export class HomePage implements OnInit, OnDestroy {
     }
   }
 
+  vaciarCreditos() {
+    let userInDB = this.escaneosUsuarios.find(doc => doc.idUsuario == this.idUser);
 
+    if (userInDB != undefined) {
+      this.creditos = 0;
+      const col = this.firestore.doc('creditos-usuarios/' + userInDB.id);
+      col.update({
+        creditosTotales: 0,
+        codigosEscaneados: []
+      });
+    }
+  }
 
   async scan() {
     const permisson = await this.requestCameraPermission();
     console.log(permisson);
+
     if (permisson) {
       const { barcodes } = await BarcodeScanner.scan();
+
       if (barcodes.length > 0) {
         this.infoQR = barcodes[0].rawValue.trim();
         this.evaluarCarga();
       }
+
       this.barcodes.push(...barcodes);
     } else {
       this.alert.sweetAlert('Escáner rechazado',
@@ -134,7 +163,6 @@ export class HomePage implements OnInit, OnDestroy {
 
   async requestCameraPermission() {
     const { camera } = await BarcodeScanner.requestPermissions();
-    //return camera === 'granted' || camera === 'limited';
     return camera;
   }
 }
