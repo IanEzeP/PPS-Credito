@@ -3,6 +3,7 @@
     <ion-title>
       Bienvenido: {{ nombre }}
     </ion-title>
+    <ion-icon name="log-out" size="large" (click)="cerraSesion()"></ion-icon>
   </ion-toolbar>
 </ion-header>
 
@@ -16,7 +17,7 @@
         Escanear
       </ion-button>
     </div>
-    <ion-button color="medium" (click)="vaciarCreditos()">
+    <ion-button color="medium" (click)="vaciarCreditos()" [disabled]="(this.creditos == 0)">
       Vaciar créditos
     </ion-button>
   </div>

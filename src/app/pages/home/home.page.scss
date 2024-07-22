@@ -8,6 +8,17 @@
   transform: translateY(-50%);
 }
 
+ion-toolbar {
+  position: relative;
+}
+
+ion-icon {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+}
+
 #container strong {
   font-size: 20px;
   line-height: 26px;

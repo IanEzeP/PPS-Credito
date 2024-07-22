@@ -8,6 +8,8 @@ import { AuthService } from 'src/app/services/auth.service';
 import { DatabaseService } from 'src/app/services/database.service';
 import { map, Subscription } from 'rxjs';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-home',
@@ -16,7 +18,7 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 })
 export class HomePage implements OnInit, OnDestroy {
 
-  public barcodes: Barcode[] = []; //?
+  public barcodes: Barcode[] = [];
   public infoQR: string | null = null;
   public scanSupported: boolean = false;
   public scanAvailable: boolean = false;
@@ -31,14 +33,7 @@ export class HomePage implements OnInit, OnDestroy {
   private escaneosSubs: Subscription = Subscription.EMPTY;
 
   constructor(private alert: AlertService, private data: DatabaseService, 
-    private auth: AuthService, private firestore: AngularFirestore) {}
-
-  /*
-  QR encriptado, al escanearlo devuelve un código
-  100 = 2786f4877b9091dcad7f35751bfcf5d5ea712b2f--
-  50 = ae338e4e0cbb4e4bcffaf9ce5b409feb8edd5172 --
-  10 = 8c95def646b6127282ed50454b73240300dccabc--
-  */
+    private auth: AuthService, private firestore: AngularFirestore, private router: Router) {}
  
   ngOnInit(): void {
     this.perfil = this.auth.loggedUser.perfil;
@@ -89,6 +84,7 @@ export class HomePage implements OnInit, OnDestroy {
 
       let userInDB = this.escaneosUsuarios.find(doc => doc.idUsuario == this.idUser);
       if (userInDB != undefined) { this.creditos = userInDB.creditosTotales; }
+      console.log("Muestro creditos: " + this.creditos);
     }));
   }
 
@@ -106,8 +102,7 @@ export class HomePage implements OnInit, OnDestroy {
       if (qrCargado == false) {
         this.cargarCreditos(userInDB);
       } else {
-        if (this.perfil == 'admin') {//Si está cargado una vez, cargarlo nuevamente, sino, rebotar solicitud
-          //Probar array.reduce. Alternativa usar indexof y lastindex y comparar los resultados
+        if (this.perfil == 'admin') {
           let result = this.isElementRepeated(userInDB.codigosEscaneados, this.infoQR);
           
           if (result) {
@@ -129,11 +124,11 @@ export class HomePage implements OnInit, OnDestroy {
     return count > 1;
   }
 
-  //Añadimos a la BD: Subimos idUsuario, codigosEscaneados con el qr, creditosTotales.
   altaCreditosUsuario() {
     let codigo = this.codigosQR.find(qr => qr.id == this.infoQR);
 
     if (codigo.valor != undefined) {
+
       let codigosEscaneados: Array<string> = [codigo.id];
 
       const newId = this.firestore.createId();
@@ -147,11 +142,12 @@ export class HomePage implements OnInit, OnDestroy {
       this.creditos = codigo.valor;
     }
   }
-  //Actualizamos la BD: Sumamos el valor del codigo a creditosTotales y añadimos el codigo a codigosEscaneados
+
   cargarCreditos(usuarioCreditos: any) {
     let codigo = this.codigosQR.find(qr => qr.id == this.infoQR);
-
+    
     if (codigo.valor != undefined) {
+
       usuarioCreditos.creditosTotales += codigo.valor;
       usuarioCreditos.codigosEscaneados.push(codigo.id);
 
@@ -167,12 +163,26 @@ export class HomePage implements OnInit, OnDestroy {
     let userInDB = this.escaneosUsuarios.find(doc => doc.idUsuario == this.idUser);
 
     if (userInDB != undefined) {
-      this.creditos = 0;
+      Swal.fire({
+        heightAuto: false,
+        title: '¿Desea vaciar sus créditos?',
+        text: 'Todos los créditos acumulados se perderán, pero podrá volver a cargarlos escaneando los QR correspondientes',
+        icon: 'warning',
+        showCancelButton: true,
+        cancelButtonColor: '#3085d6',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Vaciar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.creditos = 0;
 
-      const col = this.firestore.doc('creditos-usuarios/' + userInDB.id);
-      col.update({
-        creditosTotales: 0,
-        codigosEscaneados: []
+          const col = this.firestore.doc('creditos-usuarios/' + userInDB.id);
+          col.update({
+            creditosTotales: 0,
+            codigosEscaneados: []
+          });
+        }
       });
     }
   }
@@ -200,5 +210,22 @@ export class HomePage implements OnInit, OnDestroy {
   async requestCameraPermission() {
     const { camera } = await BarcodeScanner.requestPermissions();
     return camera;
+  }
+
+  cerraSesion() {
+    Swal.fire({
+      heightAuto: false,
+      title: '¿Cerrar Sesión?',
+      icon: 'warning',
+      showCancelButton: true,
+      cancelButtonColor: '#3085d6',
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Cerrar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.auth.logOut().then(() => this.router.navigateByUrl('/login'));
+      }
+    });
   }
 }
