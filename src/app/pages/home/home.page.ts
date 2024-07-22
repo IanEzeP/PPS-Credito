@@ -108,19 +108,27 @@ export class HomePage implements OnInit, OnDestroy {
       } else {
         if (this.perfil == 'admin') {//Si está cargado una vez, cargarlo nuevamente, sino, rebotar solicitud
           //Probar array.reduce. Alternativa usar indexof y lastindex y comparar los resultados
-          /*if () {
-            this.cargarCreditos(userInDB);
+          let result = this.isElementRepeated(userInDB.codigosEscaneados, this.infoQR);
+          
+          if (result) {
+            this.alert.sweetAlert('ERROR', 'No puede escanear este QR más de dos veces', 'error');
           } else {
-            this.alert.sweetAlert('ERROR', 'No puedo volver a escanear este QR', 'error');
-          }*/
+            this.cargarCreditos(userInDB);
+          }
         } else {
-          this.alert.sweetAlert('ERROR', 'No puedo volver a escanear este QR', 'error');
+          this.alert.sweetAlert('ERROR', 'No puede volver a escanear este QR', 'error');
         }
       }
     } else {
       this.altaCreditosUsuario(); 
     }
   }
+
+  isElementRepeated(array: Array<any>, element: any) : boolean {
+    const count = array.filter(item => item === element).length;
+    return count > 1;
+  }
+
   //Añadimos a la BD: Subimos idUsuario, codigosEscaneados con el qr, creditosTotales.
   altaCreditosUsuario() {
     let codigo = this.codigosQR.find(qr => qr.id == this.infoQR);
