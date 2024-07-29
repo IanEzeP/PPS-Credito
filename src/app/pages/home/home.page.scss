@@ -8,6 +8,10 @@
   transform: translateY(-50%);
 }
 
+ion-content {
+  --background: url(../../../assets/hexagons.jpg);
+}
+
 ion-toolbar {
   position: relative;
 }
@@ -19,20 +23,40 @@ ion-icon {
   height: 100%;
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+ion-button.code {
+  margin-top: 10%;
+  width: 90%;
+  --background: var(--ion-color-light);
+
+  border: 14px solid #4d235f;
+  border-radius: 3px;
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-
-  color: #8c8c8c;
-
-  margin: 0;
+ion-button.clear {
+  margin-top: 60px;
+  color: white;
+  --background: var(--ion-color-danger);
+  font-size: x-small;
 }
 
-#container a {
-  text-decoration: none;
+ion-card {
+  margin-top: 55px;
+  height: 300px;
+  border: 12px solid rgb(70, 70, 70);
+  border-radius: 3px;
+  --background: rgb(255, 255, 255);
+}
+
+ion-card-subtitle {
+  font-size: 50px;
+  font-weight: 500;
+  color: black;
+  margin-top: 20px;
+}
+
+ion-card-title {
+  font-size: 90px;
+  font-weight: 600;
+  color: #4d235f;
+  margin-top: 40px;
 }

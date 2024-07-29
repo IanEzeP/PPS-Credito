@@ -8,17 +8,22 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-
   <div id="container">
-
+    <ion-button class="clear" (click)="vaciarCreditos()" [disabled]="(this.creditos == 0)">
+    Vaciar créditos
+  </ion-button>
     <div id="creditos">
-      <h1>Créditos: {{ creditos }}</h1>
-      <ion-button (click)="scan()" [disabled]="!(this.scanAvailable && this.scanSupported)">
-        Escanear
+      <ion-card>
+        <ion-card-header>
+          <ion-card-subtitle>Créditos:</ion-card-subtitle>
+          <ion-card-title>{{ creditos }}</ion-card-title>
+        </ion-card-header>
+      </ion-card>
+      <ion-button class="code" (click)="scan()" [disabled]="!(this.scanAvailable && this.scanSupported)"><!---->
+        <img src="../../../assets/QR-Code.png" alt="Escanear QR" style="max-height: 70%; margin: auto;
+    display: block;">
       </ion-button>
     </div>
-    <ion-button color="medium" (click)="vaciarCreditos()" [disabled]="(this.creditos == 0)">
-      Vaciar créditos
-    </ion-button>
+    
   </div>
 </ion-content>
