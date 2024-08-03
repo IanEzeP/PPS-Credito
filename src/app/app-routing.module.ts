@@ -12,9 +12,14 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'anim-splash',
     pathMatch: 'full'
   },
+  {
+    path: 'anim-splash',
+    loadChildren: () => import('./anim-splash/anim-splash.module').then( m => m.AnimSplashPageModule)
+  },
+
 ];
 
 @NgModule({

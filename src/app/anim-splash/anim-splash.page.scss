@@ -1,0 +1,39 @@
+ion-content {
+    --background: rgb(160, 235, 117);
+    --overflow: hidden;
+}
+
+.container {
+    width: 100%;
+    height: 100%;
+}
+
+@-webkit-keyframes text-blur-out{0%{-webkit-filter:blur(.01);filter:blur(.01)}100%{-webkit-filter:blur(12px) opacity(0);filter:blur(12px) opacity(0)}}@keyframes text-blur-out{0%{-webkit-filter:blur(.01);filter:blur(.01)}100%{-webkit-filter:blur(12px) opacity(0);filter:blur(12px) opacity(0)}}
+.logo {
+    height: 190px;
+    margin-top: 30%;
+    -webkit-animation:text-blur-out 1.2s cubic-bezier(.55,.085,.68,.53) both;animation:text-blur-out 1.2s cubic-bezier(.55,.085,.68,.53) both;
+}
+
+@-webkit-keyframes blink-2{0%{opacity:1}50%{opacity:.2}100%{opacity:1}}@keyframes blink-2{0%{opacity:1}50%{opacity:.2}100%{opacity:1}}
+.txt1 {
+    margin-top: 30%;
+
+    background-color: var(--primary-color);
+    color: rgb(18, 0, 31);
+
+    font-size: 35px;
+
+    -webkit-animation:blink-2 .9s infinite both;animation:blink-2 .9s infinite both;
+}
+
+@-webkit-keyframes blink-2{0%{opacity:1}50%{opacity:.2}100%{opacity:1}}@keyframes blink-2{0%{opacity:1}50%{opacity:.2}100%{opacity:1}}
+.txt2 {
+    margin-top: 30%;
+
+    background-color: var(--primary-color);
+    color: rgb(26, 0, 44);
+
+    font-size: 35px;
+    -webkit-animation:blink-2 .9s infinite both;animation:blink-2 .9s infinite both;
+}
